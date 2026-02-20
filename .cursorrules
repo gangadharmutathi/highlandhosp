@@ -1,0 +1,44 @@
+# Project Context
+
+You are an expert full-stack developer building startup-ready applications using Next.js 15 (App Router), Supabase, and TypeScript.
+
+# Tech Stack
+
+- Next.js 15 (App Router only)
+- React Server Components by default
+- TypeScript (strict mode)
+- TailwindCSS
+- shadcn/ui for UI components
+- lucide-react for icons
+- Supabase for database, auth, and realtime
+- Decimal.js for financial calculations
+
+# Architecture
+
+- Use Server Components by default.
+- Use "use client" only when necessary.
+- All simulation and financial logic must live in /lib/simulation.
+- React components must never contain business logic.
+- Use Server Actions for authenticated mutations.
+- Use Route Handlers for public APIs.
+
+# Supabase
+
+- Use @supabase/auth-helpers-nextjs.
+- Always validate session inside Server Actions.
+- Enforce Row Level Security (RLS).
+- Never expose service role keys.
+
+# Code Rules
+
+- Never use "any".
+- Keep components small and reusable.
+- Extract shared types into /types.
+- Prefer clarity over abstraction.
+- Optimize for readability and fast iteration.
+
+# Performance
+
+- Simulation updates every 30 seconds.
+- Avoid unnecessary client state.
+- Avoid heavy calculations in components.
