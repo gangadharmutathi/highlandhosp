@@ -43,7 +43,7 @@ export function MenuClient({ desktopAvatar }: MenuClientProps) {
         </Link>
         <div className="flex items-center gap-3">
           <Button variant="brand" size="default" asChild>
-            <Link href="/">Book Appointment</Link>
+            <Link href="/#our-doctors">Book Appointment</Link>
           </Button>
           {desktopAvatar}
         </div>
@@ -82,7 +82,11 @@ export function MenuClient({ desktopAvatar }: MenuClientProps) {
               >
                 <span className="text-sm font-medium py-3">Home</span>
               </Link>
-              <Link href="/" onClick={closeMobileMenu} className="w-full">
+              <Link
+                href="/#our-doctors"
+                onClick={closeMobileMenu}
+                className="w-full"
+              >
                 <Button variant="brand" size="default" className="w-full">
                   Book Appointment
                 </Button>
