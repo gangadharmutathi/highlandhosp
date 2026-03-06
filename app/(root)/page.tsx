@@ -2,6 +2,7 @@ import DepartmentSections from "@/components/organisms/our-department";
 import OurDoctors from "@/components/organisms/our-doctors";
 import PatientTestimonialsSection from "@/components/organisms/patient-testimonials-section";
 import HomeBanner from "@/components/organisms/home-banner";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -18,7 +19,9 @@ export default function Home() {
           expert diagnosis and personalized treatment planning in one convenient
           location.
         </p>
-        <DepartmentSections />
+        <Suspense fallback={<p>Loading Departments...</p>}>
+          <DepartmentSections />
+        </Suspense>
       </div>
       <div id="our-doctors">
         <OurDoctors />

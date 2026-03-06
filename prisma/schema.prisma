@@ -1,0 +1,273 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+  output          = "../db/generated/client" // Custom output path
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["highland"]
+  // Notice: No url or directUrl here anymore!
+}
+
+// --- ENUMS ---
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+
+  @@schema("highland")
+}
+
+enum LeaveType {
+  FULL_DAY
+  MORNING
+  AFTERNOON
+
+  @@schema("highland")
+}
+
+enum PatientType {
+  MYSELF
+  SOMEONE_ELSE
+
+  @@schema("highland")
+}
+
+enum AppointmentStatus {
+  PAYMENT_PENDING
+  BOOKING_CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  CASH
+
+  @@schema("highland")
+}
+
+enum TransactionStatus {
+  COMPLETED
+  FAILED
+  CANCELLED
+
+  @@schema("highland")
+}
+
+// --- MODELS ---
+
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @default("NO_NAME")
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  role          UserRole  @default(PATIENT)
+  isRootAdmin   Boolean?  @default(false)
+  image         String?
+  dateofBirth   DateTime?
+  phoneNumber   String?
+  address       String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relationships
+  accounts            Account[]
+  doctorProfile       DoctorProfile?
+  doctorLeaves        DoctorLeave[]       @relation("DoctorToLeave")
+  doctorAppointments  Appointment[]       @relation("DoctorAppointments")
+  userAppointments    Appointment[]       @relation("UserAppointments")
+  doctorTestimonials  DoctorTestimonial[] @relation("DoctorTestimonials")
+  PatientTestimonials DoctorTestimonial[] @relation("PatientTestimonials")
+  doctorTransactions  Transaction[]
+
+  @@map("user")
+  @@schema("highland")
+}
+
+model Account {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String   @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("account")
+  @@schema("highland")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtoken")
+  @@schema("highland")
+}
+
+model DoctorProfile {
+  profileId       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @unique @db.Uuid
+  specialty       String
+  brief           String   @db.Text
+  credentials     String   @db.Text
+  languages       String[]
+  rating          Float    @default(0)
+  reviewCount     Int      @default(0)
+  specializations String[]
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("doctorprofile")
+  @@schema("highland")
+}
+
+model DoctorLeave {
+  leaveId   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  doctorId  String    @db.Uuid
+  leaveDate DateTime  @db.Date
+  leaveType LeaveType
+  reason    String?
+  createdAt DateTime  @default(now())
+
+  doctor User @relation("DoctorToLeave", fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, leaveDate])
+  @@map("doctorleave")
+  @@schema("highland")
+}
+
+model AppSettings {
+  id                      String @id @default("global")
+  slotsPerHour            Int    @default(2)
+  startTime               String @default("09:00")
+  endTime                 String @default("17:00")
+  slotReservationDuration Int    @default(10)
+
+  @@map("appsettings")
+  @@schema("highland")
+}
+
+model WorkingDay {
+  dayId        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dayOfWeek    Int     @unique
+  isWorkingDay Boolean @default(true)
+
+  @@map("workingday")
+  @@schema("highland")
+}
+
+model Appointment {
+  appointmentId        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  doctorId             String            @db.Uuid
+  userId               String?           @db.Uuid
+  guestIdentifier      String?
+  patientType          PatientType
+  patientRelation      String?
+  patientName          String
+  paymentMethod        String?
+  paymentResult        Json?
+  paidAt               DateTime?
+  appointmentStartUTC  DateTime
+  appointmentEndUTC    DateTime
+  phoneNumber          String?
+  reasonForVisit       String?
+  additionalNotes      String?           @db.Text
+  patientDateOfbBirth  DateTime?
+  reservationExpiresAt DateTime?
+  status               AppointmentStatus @default(PAYMENT_PENDING)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  doctor       User               @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  user         User?              @relation("UserAppointments", fields: [userId], references: [id])
+  testimonial  DoctorTestimonial?
+  transactions Transaction[]
+
+  @@map("appointment")
+  @@schema("highland")
+}
+
+model DoctorTestimonial {
+  testimonialId   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appointmentId   String   @unique @db.Uuid
+  doctorId        String   @db.Uuid
+  patientId       String   @db.Uuid
+  testimonialText String   @db.Text
+  rating          Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  appointment Appointment @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
+  doctor      User        @relation("DoctorTestimonials", fields: [doctorId], references: [id])
+  patient     User        @relation("PatientTestimonials", fields: [patientId], references: [id])
+
+  @@map("doctortestimonial")
+  @@schema("highland")
+}
+
+model Transaction {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appointmentId        String            @db.Uuid
+  doctorId             String            @db.Uuid
+  paymentGateway       String // Paypal
+  gatewayTransactionId String            @unique //for Paypal success : capture id, failure: order id
+  amount               Float
+  currency             String
+  status               TransactionStatus
+  transactionDate      DateTime          @default(now())
+  notes                String? //store any message for error
+  paymentDetails       Json? //raw gateway response
+
+  appointment Appointment @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
+  doctor      User        @relation(fields: [doctorId], references: [id])
+
+  @@map("transaction")
+  @@schema("highland")
+}
+
+model BannerImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  imageUrl  String
+  fileKey   String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bannerimage")
+  @@schema("highland")
+}
+
+model Department {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @unique
+  iconName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("department")
+  @@schema("highland")
+}
