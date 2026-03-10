@@ -29,3 +29,16 @@ export type DoctorReviews = {
 };
 
 export type BannerImageData = BannerImage;
+
+export interface DoctorDetails {
+  id: string;
+  name: string;
+  specialty: string;
+  rating: number;
+  reviewCount: number;
+  imageUrl: string;
+  brief: string;
+  credentials: string;
+  languages: string[];
+  specializations: string[];
+}
