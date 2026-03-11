@@ -70,6 +70,7 @@ export async function getDoctorDetails(
 
     const doctorDetails: DoctorDetails = {
       id: doctorProfile.profileId,
+      userId: doctorProfile.userId,
       name: doctorProfile.user.name,
       specialty: doctorProfile.specialty,
       rating: doctorProfile.rating,

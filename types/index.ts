@@ -31,7 +31,8 @@ export type DoctorReviews = {
 export type BannerImageData = BannerImage;
 
 export interface DoctorDetails {
-  id: string;
+  id: string; // profileId - used for display
+  userId: string; // User.id - used for querying reviews
   name: string;
   specialty: string;
   rating: number;
