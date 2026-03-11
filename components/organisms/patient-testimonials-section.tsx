@@ -1,10 +1,10 @@
 import ReviewCard from "@/components/molecules/reviewcard";
-import { getDoctorReviews } from "@/lib/actions/review.actions";
+import { getPatientTestimonials } from "@/lib/actions/review.actions";
 import { DoctorReviews } from "@/types";
 
 export default async function PatientTestimonialsSection() {
   // 1. Fetch real testimonials from Supabase
-  const response = await getDoctorReviews();
+  const response = await getPatientTestimonials();
 
   // 2. Handle failure or empty data
   if (!response.success || !response.data) {
