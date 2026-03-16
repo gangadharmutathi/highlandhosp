@@ -25,7 +25,10 @@ export const auth = betterAuth({
   // ── Trusted Origins ───────────────────────────────────────────────────────
   // Explicitly trust our local development origin.
   // Required for Better Auth to accept requests from the browser.
-  trustedOrigins: ["http://localhost:3000", "https://your-app.vercel.app"],
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://highlandclinic.vercel.app",
+  ],
 
   // ── Database ──────────────────────────────────────────────────────────────
   // Connect Better Auth to your Prisma client.
