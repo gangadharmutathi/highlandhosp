@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "./prisma-seed";
 import { doctorProfiles, appointments, testimonials } from "./dummydata2";
 import { AppointmentStatus, PatientType } from "./generated/client";
 
@@ -22,9 +22,9 @@ async function main() {
     // Find the user email associated with the placeholder ID in your dummy file
     // Note: In dummydata2, doctor1Id is used. We'll map the emails directly.
     const emailMap: Record<string, string> = {
-      "c3250068-f57d-42dc-b189-a76ec713c2b1": "alice.williams@clinic.com",
-      "8c1c074b-8bdb-4f72-94ff-442aef88be0e": "bob.brown@clinic.com",
-      "678241b9-99cf-4312-b9f3-28e14c60e9e7": "carol.davis@clinic.com",
+      "14def99c-0205-4e6e-a770-a716e04d3fa3": "alice.williams@clinic.com",
+      "ce542762-d8e0-411c-bac4-c9746716d330": "bob.brown@clinic.com",
+      "6a92639b-8ae1-401a-8624-3314937925d3": "carol.davis@clinic.com",
     };
 
     const userEmail = emailMap[profile.userId];

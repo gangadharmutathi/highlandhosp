@@ -1,3 +1,5 @@
+//db/generated/dummydata.ts
+
 export const bannerImageData = [
   {
     id: "banner-1",

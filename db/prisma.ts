@@ -1,3 +1,5 @@
+//db/prisma.ts
+
 import { PrismaClient } from "../db/generated/client"; // Point to your custom output
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";

@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "./prisma-seed";
 import { testimonials } from "./dummydata2";
 
 async function main() {

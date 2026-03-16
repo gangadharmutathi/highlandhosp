@@ -1,5 +1,5 @@
 // db/seed.ts
-import { prisma } from "./prisma";
+import { prisma } from "./prisma-seed";
 import {
   users,
   departments,

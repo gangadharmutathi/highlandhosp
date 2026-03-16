@@ -1,4 +1,6 @@
-import { UserRole, PatientType } from "../db/generated/client";
+//db/generated/dummydata2.ts
+
+import { UserRole, PatientType } from "./generated/client";
 
 // This file contains dummy data for your Prisma schema.
 // You can use this in a seed script to populate your database for development and testing.
@@ -15,24 +17,24 @@ import { UserRole, PatientType } from "../db/generated/client";
 // --- Placeholder IDs (for demonstration purposes) ---
 // In a real script, you'd capture these from the database create operations.
 
-export const patient1Id = "44651fcb-20bc-4e00-a615-c7082df83ea8";
-export const doctor1Id = "c3250068-f57d-42dc-b189-a76ec713c2b1";
-export const doctor2Id = "8c1c074b-8bdb-4f72-94ff-442aef88be0e";
-export const doctor3Id = "678241b9-99cf-4312-b9f3-28e14c60e9e7";
+export const patient1Id = "a9547c66-87ae-49d9-82f2-0ed195586b45";
+export const doctor1Id = "14def99c-0205-4e6e-a770-a716e04d3fa3";
+export const doctor2Id = "ce542762-d8e0-411c-bac4-c9746716d330";
+export const doctor3Id = "6a92639b-8ae1-401a-8624-3314937925d3";
 
 // These IDs are placeholders. In a real seed, you'd get the actual appointment IDs after creation.
 
 export const appointmentIds = {
-  apt1: "04ae16f0-f13b-48d9-9919-68a4524733cd",
-  apt2: "fbf6cb2c-b898-427f-ba64-35d58cd84b46",
-  apt3: "7560f024-ffb7-4ea4-bb0a-59198505be1b",
-  apt4: "4aeb2449-c13b-4ea8-91b9-8530b3cffbc9",
-  apt5: "514277c8-2034-466a-ab57-8fef056c8286",
-  apt6: "eafa10da-7019-4724-b530-97589df65952",
-  apt7: "4137b0df-8aee-4abf-a62b-194aa6d662d9",
-  apt8: "5694b123-44a7-4abc-aabd-7200da0f3d93",
-  apt9: "389f8fcb-1785-49fa-b64b-5f118ff4ac8d",
-  apt10: "a1c461ce-ebc6-4cc6-8268-ab90cbd4064f",
+  apt1: "98a6991f-4dfb-4a34-9732-bcab83f25163",
+  apt2: "45555a7d-f874-4e6a-920a-37783ab33595",
+  apt3: "0c7480be-22e0-44a9-8a92-ecf18cca2448",
+  apt4: "6ec5175e-784a-49cc-b59e-24a52afb2885",
+  apt5: "10657f82-9d29-4ac8-864e-d0cd162032d1",
+  apt6: "abc05680-78ee-4784-97fc-1bdd4147f0b3",
+  apt7: "6854eda7-f8ee-4391-a5f9-8e66e8c61f62",
+  apt8: "01752f77-8859-4797-9e81-f7ec00ecff0e",
+  apt9: "c4ab5b75-26bd-453f-9e95-0df6ab39a13b",
+  apt10: "6c16245b-7147-4ed6-954f-f7a11139f145",
 };
 
 // =================================================================================

@@ -19,14 +19,9 @@ import { defineConfig, env } from "prisma/config";
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    /* For Prisma 7 'db push', we want the Direct connection.
-       We will point this to DIRECT_URL for now to get your 
-       tables created.
-    */
     url: env("DIRECT_URL"),
   },
   migrations: {
-    // This tells Prisma how to execute your seed file
-    seed: 'ts-node --compiler-options {"module":"CommonJS"} db/seed3.ts',
+    seed: 'ts-node --compiler-options {"module":"CommonJS"} db/seed.ts',
   },
 });

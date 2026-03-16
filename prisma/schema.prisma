@@ -67,7 +67,7 @@ model User {
   name          String    @default("NO_NAME")
   email         String    @unique
   password      String?
-  emailVerified DateTime?
+  emailVerified Boolean   @default(false)
   role          UserRole  @default(PATIENT)
   isRootAdmin   Boolean?  @default(false)
   image         String?
@@ -86,30 +86,29 @@ model User {
   doctorTestimonials  DoctorTestimonial[] @relation("DoctorTestimonials")
   PatientTestimonials DoctorTestimonial[] @relation("PatientTestimonials")
   doctorTransactions  Transaction[]
+  sessions            Session[]
 
   @@map("user")
   @@schema("highland")
 }
 
 model Account {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId            String   @db.Uuid
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?  @db.Text
-  session_state     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                String    @db.Uuid
+  accountId             String // OAuth provider's user ID (was providerAccountId)
+  providerId            String // e.g. "google", "credential" (was provider)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String? // used for email/password accounts
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
   @@map("account")
   @@schema("highland")
 }
@@ -269,5 +268,33 @@ model Department {
   updatedAt DateTime @updatedAt
 
   @@map("department")
+  @@schema("highland")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+  @@schema("highland")
+}
+
+model Verification {
+  id         String   @id
+  identifier String // email address the verification is for
+  value      String // the token/code
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
   @@schema("highland")
 }
