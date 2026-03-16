@@ -14,7 +14,6 @@
 //   const { data: session } = authClient.useSession();
 
 import { createAuthClient } from "better-auth/react";
-import type { Auth } from "./auth";
 
 export const authClient = createAuthClient({
   // Points to your Better Auth API route.

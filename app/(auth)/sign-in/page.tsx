@@ -23,7 +23,10 @@ export default function SignInPage() {
       <Suspense fallback={null}>
         <SignInMessage />
       </Suspense>
-      <SignInForm />
+      {/* SignInForm also needs Suspense because it uses useSearchParams() */}
+      <Suspense fallback={null}>
+        <SignInForm />
+      </Suspense>
     </>
   );
 }

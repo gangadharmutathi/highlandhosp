@@ -1,45 +1,31 @@
 "use client";
 // components/organisms/doctor-profile/scheduler-confirm.tsx
 //
-// Shows a summary of the selected date and time slot, then lets the patient
-// click "Continue to Next Step" to book the appointment.
+// Shows a summary of the selected date and time slot, then navigates
+// the patient to the booking page to fill in their details.
 //
-// For now this calls createAppointment directly.
-// In a future phase this would hand off to a payment flow.
-//
-// States:
-//   • Ready    — shows date, time, doctor name, and the confirm button
-//   • Loading  — button shows spinner while createAppointment runs
-//   • Error    — displays error message (e.g. slot was just taken)
-//   • Success  — displays a confirmation message with appointment ID
+// This component no longer calls createAppointment directly —
+// that responsibility has moved to the booking page flow.
 
-import { useState } from "react";
-import {
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  CalendarDays,
-  Clock,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CalendarDays, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TimeSlot, AppointmentRequest, ServerActionResponse } from "@/types";
-import { createAppointment } from "@/lib/actions/appointment.actions";
-import { cn } from "@/lib/utils";
+import { TimeSlot } from "@/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface SchedulerConfirmProps {
-  /** User.id of the doctor — passed to createAppointment */
+  /** User.id of the doctor */
   doctorId: string;
-  /** Doctor's display name — shown in the confirmation summary */
+  /** Doctor's display name — shown in the summary */
   doctorName: string;
   /** The date the patient selected, as "YYYY-MM-DD" */
   selectedDate: string;
   /** The time slot the patient selected */
   selectedSlot: TimeSlot;
-  /** Called when booking succeeds — lets the parent reset state if needed */
+  /** Kept for API compatibility with appointment-scheduler.tsx */
   onBookingSuccess: (appointmentId: string) => void;
 }
 
@@ -47,11 +33,6 @@ interface SchedulerConfirmProps {
 // HELPER — format date for display
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Converts "YYYY-MM-DD" to a readable string like "Sunday, March 9, 2025".
- * We add T00:00:00 to avoid timezone-shift issues that can cause the date
- * to appear as the previous day when parsed in certain timezones.
- */
 function formatDateDisplay(dateString: string): string {
   return new Date(`${dateString}T00:00:00`).toLocaleDateString("en-US", {
     weekday: "long",
@@ -67,119 +48,46 @@ function formatDateDisplay(dateString: string): string {
 
 export default function SchedulerConfirm({
   doctorId,
-  doctorName,
   selectedDate,
   selectedSlot,
-  onBookingSuccess,
 }: SchedulerConfirmProps) {
-  // Track whether the booking request is in flight
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Holds an error message if createAppointment fails
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Holds the appointmentId on success — switches component to success view
-  const [bookedId, setBookedId] = useState<string | null>(null);
-
-  // ── Handle confirm button click ──
-  async function handleConfirm() {
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    // Build the AppointmentRequest payload.
-    // NOTE: patientName and phoneNumber are hardcoded as placeholders here.
-    // In a real flow you'd collect these from a form in a previous step,
-    // or pull them from the logged-in user's session.
-    const appointmentData: AppointmentRequest = {
+  // Navigate to the booking page, passing all necessary data as query params.
+  // The booking page reads these params to pre-fill the appointment context
+  // (doctor, date, time) so the patient does not need to re-select anything.
+  function handleContinue() {
+    const params = new URLSearchParams({
       doctorId,
-      selectedDate,
+      date: selectedDate,
       startUTC: selectedSlot.startUTC,
       endUTC: selectedSlot.endUTC,
-      patientName: "Guest Patient", // TODO: replace with actual patient name from form/session
-      phoneNumber: "", // TODO: replace with actual phone number
-      reasonForVisit: "", // TODO: replace with actual reason
-      patientType: "MYSELF", // TODO: make this selectable in the form
-    };
+      slotLabel: selectedSlot.label,
+    });
 
-    // Call the server action — this runs on the server even though we're in a client component
-    const result: ServerActionResponse<{ appointmentId: string }> =
-      await createAppointment(appointmentData);
-
-    setIsLoading(false);
-
-    if (result.success && result.data) {
-      // Booking succeeded — switch to success view
-      setBookedId(result.data.appointmentId);
-      onBookingSuccess(result.data.appointmentId);
-    } else {
-      // Show the error message from the server action
-      setErrorMessage(
-        result.error ?? "Something went wrong. Please try again.",
-      );
-    }
+    router.push(`/appointments/book?${params.toString()}`);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // SUCCESS STATE — shown after a successful booking
-  // ─────────────────────────────────────────────────────────────────────────
-  if (bookedId) {
-    return (
-      <div className="flex flex-col items-center gap-3 py-4 text-center">
-        <CheckCircle2 className="w-10 h-10 text-green-500" />
-        <p className="font-semibold text-gray-800">Appointment Booked!</p>
-        <p className="text-sm text-gray-500">
-          Your appointment with <strong>{doctorName}</strong> on{" "}
-          <strong>{formatDateDisplay(selectedDate)}</strong> at{" "}
-          <strong>{selectedSlot.label}</strong> is confirmed.
-        </p>
-        <p className="text-xs text-gray-400">Reference: {bookedId}</p>
-      </div>
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // DEFAULT STATE — summary + confirm button
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
       {/* Appointment summary */}
       <div className="space-y-2">
         {/* Date row */}
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <CalendarDays className="w-4 h-4 text-blue-500 shrink-0" />
+        <div className="flex items-center gap-2 text-sm text-text-body">
+          <CalendarDays className="w-4 h-4 text-primary shrink-0" />
           <span>{formatDateDisplay(selectedDate)}</span>
         </div>
 
         {/* Time row */}
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <Clock className="w-4 h-4 text-blue-500 shrink-0" />
+        <div className="flex items-center gap-2 text-sm text-text-body">
+          <Clock className="w-4 h-4 text-primary shrink-0" />
           <span>{selectedSlot.label}</span>
         </div>
       </div>
 
-      {/* Error message — shown if createAppointment returned an error */}
-      {errorMessage && (
-        <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{errorMessage}</span>
-        </div>
-      )}
-
-      {/* Confirm button */}
-      <Button
-        onClick={handleConfirm}
-        disabled={isLoading}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-      >
-        {isLoading ? (
-          // Spinner shown while the server action is running
-          <span className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Booking…
-          </span>
-        ) : (
-          "Continue to Next Step"
-        )}
+      {/* Continue button — navigates to booking page */}
+      <Button onClick={handleContinue} variant="brand" className="w-full">
+        Continue to Next Step
       </Button>
     </div>
   );

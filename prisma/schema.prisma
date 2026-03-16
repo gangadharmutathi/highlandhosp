@@ -93,7 +93,7 @@ model User {
 }
 
 model Account {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                    String    @id
   userId                String    @db.Uuid
   accountId             String // OAuth provider's user ID (was providerAccountId)
   providerId            String // e.g. "google", "credential" (was provider)
@@ -133,6 +133,7 @@ model DoctorProfile {
   rating          Float    @default(0)
   reviewCount     Int      @default(0)
   specializations String[]
+  consultationFee Float    @default(0) // ← add consultation fee
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
