@@ -152,7 +152,7 @@ export default function SignInForm() {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-primary hover:bg-primary/80 text-text-body-regular"
             disabled={isLoading || isGoogleLoading}
           >
             {isLoading ? (

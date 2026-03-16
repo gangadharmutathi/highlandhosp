@@ -166,7 +166,7 @@ export default function SchedulerCalendar({
                   "text-gray-300 cursor-not-allowed",
 
                 // Selected date: filled with the brand blue (#1976D2 from the screenshot)
-                day.isSelected && "bg-blue-600 text-white font-semibold",
+                day.isSelected && "bg-primary text-white font-semibold",
 
                 // Today (but not selected): ring highlight
                 day.isToday &&

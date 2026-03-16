@@ -188,7 +188,7 @@ export default function SignUpForm() {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-primary hover:bg-primary/80 text-text-body-regular"
             disabled={isLoading || isGoogleLoading}
           >
             {isLoading ? (
@@ -256,7 +256,7 @@ export default function SignUpForm() {
           Already have an account?{" "}
           <Link
             href="/sign-in"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-text-body-regular hover:underline font-medium"
           >
             Sign in
           </Link>
