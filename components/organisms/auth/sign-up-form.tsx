@@ -71,7 +71,7 @@ export default function SignUpForm() {
 
     // Call our server action — not Better Auth client directly
     // This ensures role is always set to PATIENT on the server
-    const result = await signUpAction(name, email, password);
+    const result = await signUpAction(name, email, password, phoneNumber);
 
     setIsLoading(false);
 

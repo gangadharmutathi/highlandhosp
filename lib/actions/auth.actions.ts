@@ -46,6 +46,7 @@ export async function signUpAction(
   name: string,
   email: string,
   password: string,
+  phoneNumber?: string, // ← add this
 ): Promise<ServerActionResponse> {
   try {
     await auth.api.signUpEmail({
@@ -53,6 +54,7 @@ export async function signUpAction(
         name,
         email,
         password,
+        phoneNumber, // ← add this
         // role and isRootAdmin are set to their defaults (PATIENT, false)
         // in lib/auth.ts additionalFields with input: false —
         // meaning they cannot be passed in from the client side.
