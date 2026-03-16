@@ -53,6 +53,7 @@ export default function SignUpForm() {
   // ── Handle Email/Password sign up ──
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
+    if (isLoading) return; // ← add this line
     setError(null);
 
     // Client-side validation before hitting the server
