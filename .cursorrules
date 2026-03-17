@@ -28,6 +28,9 @@ You are an expert full-stack developer building startup-ready applications using
 - Always validate session inside Server Actions.
 - Enforce Row Level Security (RLS).
 - Never expose service role keys.
+- Always reference schema.prisma before writing any Supabase queries or data-fetching logic.
+- If a requested UI element requires data not present in the schema,
+  ask me for clarification instead of inventing new database columns.
 
 # Code Rules
 
@@ -36,6 +39,10 @@ You are an expert full-stack developer building startup-ready applications using
 - Extract shared types into /types.
 - Prefer clarity over abstraction.
 - Optimize for readability and fast iteration.
+- Do not delete or rename files without explicit permission.
+- Always include JSDoc comments for every new Next.js component and maintain existing comments.
+- Do not delete or rename any folder.
+- Always add concise inline comments for complex logic and JSDoc blocks for all Supabase data-fetching functions.
 
 # Performance
 

@@ -7,6 +7,7 @@ import {
   BannerImage,
   LeaveType,
   PatientType,
+  AppointmentStatus,
 } from "@/db/generated/client";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -146,3 +147,24 @@ export type AppointmentRequest = {
   patientRelation?: string; // e.g. "Spouse", "Child" — only when SOMEONE_ELSE
   additionalNotes?: string;
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NEW TYPES — User Profile
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface UserProfileSummary {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  phoneNumber: string | null;
+  address: string | null;
+  dateofBirth: Date | null;
+}
+
+export interface UserAppointmentListItem {
+  appointmentId: string;
+  doctorName: string;
+  appointmentStartUTC: string;
+  status: AppointmentStatus;
+}

@@ -22,6 +22,8 @@ import {
   ServerActionResponse,
 } from "@/types";
 import { AppointmentStatus, PatientType } from "@/db/generated/client";
+import { getSession } from "@/lib/actions/auth.actions";
+import { revalidatePath } from "next/cache";
 import {
   generateAllSlots,
   filterAvailableSlots,
@@ -331,6 +333,92 @@ export async function createAppointment(
     return {
       success: false,
       error: "Failed to book appointment. Please try again.",
+    };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. cancelAppointment
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Cancels an appointment for the currently logged-in patient.
+ *
+ * What it does:
+ * - Validates the session (must be logged in)
+ * - Ensures the appointment belongs to the patient (userId match)
+ * - Updates status to CANCELLED
+ * - Clears any reservation expiry so the slot is considered free again
+ * - Revalidates `/user/[id]` so the profile page refreshes
+ *
+ * Note on "releasing the doctor's time slot":
+ * This system derives availability from booked appointments. Marking an
+ * appointment as CANCELLED removes it from the booked-slot set, effectively
+ * releasing that time slot.
+ */
+export async function cancelAppointment(
+  appointmentId: string,
+  userId: string,
+): Promise<ServerActionResponse> {
+  try {
+    const session = await getSession();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "You must be signed in to cancel an appointment.",
+        errorType: "UNAUTHENTICATED",
+      };
+    }
+
+    if (session.user.id !== userId) {
+      return {
+        success: false,
+        error: "You are not allowed to cancel this appointment.",
+        errorType: "FORBIDDEN",
+      };
+    }
+
+    const appointment = await prisma.appointment.findUnique({
+      where: { appointmentId },
+      select: { appointmentId: true, userId: true, status: true },
+    });
+
+    if (!appointment || appointment.userId !== userId) {
+      return {
+        success: false,
+        error: "Appointment not found.",
+        errorType: "NOT_FOUND",
+      };
+    }
+
+    if (
+      appointment.status === AppointmentStatus.CANCELLED ||
+      appointment.status === AppointmentStatus.COMPLETED
+    ) {
+      return {
+        success: false,
+        error: "This appointment can no longer be cancelled.",
+        errorType: "NOT_CANCELLABLE",
+      };
+    }
+
+    await prisma.appointment.update({
+      where: { appointmentId },
+      data: {
+        status: AppointmentStatus.CANCELLED,
+        reservationExpiresAt: null,
+      },
+    });
+
+    revalidatePath(`/user/${userId}`);
+
+    return { success: true, message: "Appointment cancelled." };
+  } catch (error) {
+    console.error("[cancelAppointment] Error:", error);
+    return {
+      success: false,
+      error: "Failed to cancel appointment. Please try again.",
+      errorType: "UNKNOWN",
     };
   }
 }
