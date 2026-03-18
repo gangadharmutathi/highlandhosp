@@ -31,11 +31,16 @@ export function MobileUserSignInOrAvatar({
   // Show nothing while session is loading to avoid flash
   if (isPending) return null;
 
-  // If logged in → show user name and sign out button
-  // onSignOut closes the mobile sheet after sign out completes
+  // If logged in → show user profile dropdown; onSignOut closes the mobile sheet
   if (session?.user) {
+    const user = session.user as { id: string; name: string; image?: string | null };
     return (
-      <UserMenu name={session.user.name} onSignOut={onMobileActionComplete} />
+      <UserMenu
+        name={user.name}
+        userId={user.id}
+        image={user.image ?? null}
+        onSignOut={onMobileActionComplete}
+      />
     );
   }
 

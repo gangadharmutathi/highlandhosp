@@ -1,3 +1,11 @@
+// components/molecules/menu-client.tsx
+//
+// Client wrapper for header right section: desktop nav + mobile hamburger sheet.
+// Desktop: theme toggle, Home link, Book Appointment button, and the user section
+// (SignInOrAvatar → when logged in, User Profile dropdown with name + avatar).
+// Mobile: hamburger opens a sheet with the same links + user section in the footer.
+// We use a client component here for sheet open state and theme toggle interactivity.
+
 "use client";
 
 import { useState } from "react";
@@ -18,6 +26,7 @@ import SignInOrAvatar from "@/components/molecules/signin-avatar";
 import { MobileUserSignInOrAvatar } from "@/components/molecules/mobile-user-signinoravatar";
 
 interface MenuClientProps {
+  /** Renders the desktop user section: either Sign In button or User Profile dropdown (name + avatar) */
   desktopAvatar: React.ReactNode;
 }
 
